@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Game Night 🧡</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  height:100vh;
+  overflow:hidden;
+  background:#fff0f5; /* Sfondo rosa chiarissimo di base */
+}
+
+body::before{
+  content:"";
+  position:fixed;
+  top:0;left:0;
+  width:100%;height:100%;
+  background:url("SALVUCCIO.jpeg") center 28%/cover no-repeat; /* FOTO DI LUI COME SFONDO */
+  opacity:0.35; /* Un po' più visibile, ma non disturba le scritte */
+  z-index:-1;
+}
+
+.box{
+  background:rgba(255, 255, 255, 0.95);
+  padding:30px;
+  border-radius:20px;
+  text-align:center;
+  display:none;
+  box-shadow:0 10px 30px rgba(255, 77, 136, 0.2); /* Ombra rosata */
+  max-width: 500px;
+  margin: 40px auto;
+  border: 2px solid #ffaa66; /* Bordo arancione chiaro */
+}
+
+.active{display:block;}
+
+h2 {
+  color: #ff4d88; /* Titoli Rosa */
+}
+
+h3 {
+  color: #ff7733; /* Sottotitoli Arancioni */
+}
+
+button{
+  padding:12px 18px;
+  margin:10px;
+  border:none;
+  border-radius:12px;
+  background: linear-gradient(135deg, #ff4d88, #ff884d); /* Sfumatura Rosa-Arancio */
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+  transition: transform 0.2s;
+  box-shadow: 0 4px 10px rgba(255, 77, 136, 0.3);
+}
+
+button:hover {
+  transform: scale(1.05);
+}
+
+.back-btn {
+  background: #ff884d; /* Tasto indietro Arancione */
+  box-shadow: 0 4px 10px rgba(255, 136, 77, 0.3);
+  margin-top: 25px;
+}
+
+/* Stile per il collage ordinato */
+.collage-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  max-width: 500px;
+  margin: 20px auto 0 auto;
+}
+
+.collage-container img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  transition: transform 0.3s ease;
+  border: 2px solid #ffaa66;
+}
+
+.collage-container img:hover {
+  transform: scale(1.05);
+}
+
+#surprise {
+  max-width: 600px;
+}
+
+/* LOADING */
+#loading{
+  position:fixed;
+  top:0;left:0;
+  width:100%;
+  height:100%;
+  background: linear-gradient(135deg, #ff4d88, #ff884d);
+  color:white;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:24px;
+  z-index:9999;
+}
+
+/* Immagine finale del quiz */
+#quizEndImg {
+  width: 220px;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 50%; /* Foto tonda carina */
+  border: 4px solid #ff4d88;
+  margin: 15px auto;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+</style>
+</head>
+
+<body>
+
+<div id="loading">Caricamento... 💖</div>
+
+<!-- MENU -->
+<div id="menu" class="box">
+  <h2>💖 Game Night</h2>
+  <button onclick="startApp()">START</button>
+</div>
+
+<!-- MAIN -->
+<div id="main" class="box">
+  <h2>Scegli cosa fare</h2>
+  <button onclick="openQuiz()">🎯 Quiz</button>
+  <button onclick="location.href='gioco.html'">🎮 Gioco</button>
+  <button onclick="openSurprise()">🎁 Sorpresa</button>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz" class="box">
+  <h2>🎯 QUIZ</h2>
+  <h3 id="qText"></h3>
+  
+  <!-- Contenitore dei bottoni per poterli nascondere alla fine -->
+  <div id="quizButtons">
+    <button onclick="answer(1)">+1</button>
+    <button onclick="answer(-1)">-1</button>
+  </div>
+
+  <!-- Qui apparirà la tua foto alla fine del quiz -->
+  <div id="quizResultArea" style="display:none;">
+    <img id="quizEndImg" src="IOO.jpeg" alt="La mia foto">
+  </div>
+
+  <h3 id="scoreText"></h3>
+  <br>
+  <button class="back-btn" onclick="show('main')">⬅️ Torna al Menu</button>
+</div>
+
+<!-- SORPRESA -->
+<div id="surprise" class="box">
+  <h2>🧡 Noi</h2>
+  <div class="collage-container">
+    <img src="1.jpeg" alt="Noi 1">
+    <img src="2.jpeg" alt="Noi 2">
+    <img src="3.jpeg" alt="Noi 3">
+    <img src="4.jpeg" alt="Noi 4">
+    <img src="5.jpeg" alt="Noi 5">
+    <img src="6.jpeg" alt="Noi 6">
+  </div>
+  <br>
+  <button class="back-btn" onclick="show('main')">⬅️ Torna al Menu</button>
+</div>
+
+<script>
+/* LOADING */
+window.onload = () => {
+  setTimeout(()=>{
+    document.getElementById("loading").style.display="none";
+    document.getElementById("menu").style.display="block";
+  },2000);
+};
+
+/* NAV */
+function show(id){
+  document.querySelectorAll(".box").forEach(b=>{
+    b.classList.remove("active");
+    b.style.display="none";
+  });
+  let el=document.getElementById(id);
+  el.style.display="block";
+  el.classList.add("active");
+}
+
+function startApp(){
+  show("main");
+}
+
+function openQuiz(){
+  show("quiz");
+  startQuiz();
+}
+
+function openSurprise(){
+  show("surprise");
+}
+
+/* QUIZ DATA */
+let qIndex=0;
+let score=0;
+
+const questions=[
+"Il mio pokemon preferito è Pikachu?",
+"Qual è il mio colore preferito?",
+"Chi sono i miei cantanti italiani preferiti?",
+"Qual è la materia che odio di più?",
+"Com'ero vestita al primo appuntamento?",
+"Preferisco i gatti o i cani?",
+"Categoria di animali che odio?",
+"Tre cantanti non italiani che mi piacciono",
+"Tre parti di te che amo di più (dalla pancia in su)",
+"Esiste qualcuno meglio di me?"
+];
+
+function startQuiz(){
+  qIndex=0;
+  score=0;
+  document.getElementById("quizButtons").style.display = "block";
+  document.getElementById("quizResultArea").style.display = "none";
+  showQ();
+}
+
+function showQ(){
+  document.getElementById("qText").innerText=questions[qIndex];
+  document.getElementById("scoreText").innerText="💖 Punteggio: "+score;
+}
+
+function answer(v){
+  // Se il quiz è già finito, blocca tutto ed evita click fantasmi
+  if(qIndex >= questions.length) return;
+
+  // Aggiunge 1 o toglie 1 (se premi -1)
+  score += v;
+  qIndex++;
+
+  if(qIndex >= questions.length){
+    document.getElementById("qText").innerText = "💖 Fine quiz!";
+    document.getElementById("quizButtons").style.display = "none"; // Nasconde i pulsanti +1 e -1
+    document.getElementById("quizResultArea").style.display = "block"; // Mostra la tua foto
+    document.getElementById("scoreText").innerText = "Hai raggiunto un punteggio di: " + score + " / " + questions.length;
+    return;
+  }
+  showQ();
+}
+</script>
+</body>
+</html>

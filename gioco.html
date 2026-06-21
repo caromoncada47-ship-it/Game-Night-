@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Game Night 🧡</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  height:100vh;
+  overflow:hidden;
+  background: #fff0f5; /* Sfondo rosa coordinato */
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+/* CUORI */
+.heart{
+  position:fixed;
+  top:-10px;
+  color:#ff4d88;
+  font-size:20px;
+  animation:fall linear forwards;
+}
+
+@keyframes fall{
+  to{
+    transform:translateY(110vh);
+    opacity:0;
+  }
+}
+
+/* BOX */
+.box{
+  background:white;
+  padding:30px;
+  border-radius:20px;
+  text-align:center;
+  box-shadow:0 10px 30px rgba(255, 77, 136, 0.2);
+  max-width: 400px;
+  border: 2px solid #ffaa66;
+}
+
+h2 {
+  color: #ff4d88;
+}
+
+/* BUTTONS */
+button{
+  padding:12px 18px;
+  margin:10px;
+  border:none;
+  border-radius:12px;
+  background: linear-gradient(135deg, #ff4d88, #ff884d);
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+  box-shadow: 0 4px 10px rgba(255, 77, 136, 0.2);
+}
+
+.back-home-btn {
+  background: #ff884d;
+  margin-top: 15px;
+}
+
+/* POPUP */
+#popup{
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%) scale(0);
+  background:white;
+  padding:25px;
+  font-size: 20px;
+  font-weight: bold;
+  border-radius:15px;
+  transition:0.3s;
+  z-index:9999;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+  border: 3px solid #ff4d88;
+  color: #ff4d88;
+}
+
+#popup.show{
+  transform:translate(-50%,-50%) scale(1);
+}
+
+/* STILE PER LA FOTO FINALE DIFFERENTE */
+.end-game-img {
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 15px;
+  border: 3px solid #ff4d88;
+  margin: 15px auto;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+}
+</style>
+</head>
+
+<body>
+
+<div id="popup"></div>
+
+<!-- STEP 1 -->
+<div class="box" id="step1">
+  <h2>Vuoi giocare con me? 🎮🧡</h2>
+  <button onclick="yes()">SÌ 😍</button>
+  <button onclick="no()">NO 😏</button>
+  <br>
+  <button class="back-home-btn" onclick="location.href='minigioco.html'">⬅️ Menu Principale</button>
+</div>
+
+<!-- STEP 2 -->
+<div class="box" id="step2" style="display:none;">
+  <h2>Scegli il gioco</h2>
+  <button onclick="setGame('Minecraft')">Minecraft</button>
+  <button onclick="setGame('Fortnite')">Fortnite</button>
+  <button onclick="setGame('Altro')">Altro</button>
+</div>
+
+<!-- STEP 3 -->
+<div class="box" id="step3" style="display:none;">
+  <h2>Quando giochiamo?</h2>
+  <button onclick="setTime('Stasera')">Stasera</button>
+  <button onclick="setTime('Domani')">Domani</button>
+</div>
+
+<!-- STEP 4 -->
+<div class="box" id="step4" style="display:none;">
+  <h2 id="summary"></h2>
+  <button onclick="startGame()">🎮 Inizia</button>
+  <br>
+  <button class="back-home-btn" onclick="location.href='minigioco.html'">⬅️ Menu Principale</button>
+</div>
+
+<!-- BOX FINE GIOCO CON IMMAGINE DINAMICA -->
+<div class="box" id="endGameBox" style="display:none;">
+  <h2>🏆 Gioco Completato!</h2>
+  <img id="endGameImg" class="end-game-img" src="" alt="Foto Finale">
+  <p style="color: #ff4d88; font-weight: bold; font-size: 18px;">Avete superato tutte le sfide! 🥰</p>
+  <button class="back-home-btn" onclick="location.href='minigioco.html'">⬅️ Torna al Menu</button>
+</div>
+
+<script>
+/* STATE */
+let game="";
+let time="";
+let currentPunishments = []; 
+
+/* STEP NAV */
+function show(step){
+  document.querySelectorAll(".box").forEach(b=>b.style.display="none");
+  document.getElementById("step"+step).style.display="block";
+}
+
+function yes(){
+  document.querySelectorAll(".no-btn").forEach(btn => btn.remove());
+  show(2);
+}
+
+function createFleeNo(){
+  spawnNo();
+}
+
+function spawnNo(){
+  let btn=document.createElement("button");
+  btn.innerText="NO 😈";
+  btn.classList.add("no-btn");
+
+  btn.style.position="fixed";
+  btn.style.left=Math.random()*(window.innerWidth - 100)+"px";
+  btn.style.top=Math.random()*(window.innerHeight - 50)+"px";
+  btn.style.zIndex="9999";
+
+  btn.onclick=duplicateNo;
+  btn.onmouseover=moveNo;
+
+  document.body.appendChild(btn);
+}
+
+function duplicateNo(){
+  for(let i=0;i<3;i++){
+    spawnNo();
+  }
+}
+
+function moveNo(){
+  this.style.left=Math.random()*(window.innerWidth - 100)+"px";
+  this.style.top=Math.random()*(window.innerHeight - 50)+"px";
+}
+
+function no(){
+  createFleeNo();
+}
+
+/* STEP 2 */
+function setGame(g){
+  game=g;
+  show(3);
+}
+
+/* STEP 3 */
+function setTime(t){
+  time=t;
+  document.getElementById("summary").innerText=
+  "Perfetto 🧡 Giochiamo a "+game+" "+time;
+  show(4);
+}
+
+/* START */
+function startGame() {
+  document.querySelectorAll(".box").forEach(b=>b.style.display="none");
+  currentPunishments = [...punishments[game]];
+  
+  let backBox = document.createElement("div");
+  backBox.id = "playingBox";
+  backBox.className = "box";
+  backBox.innerHTML = "<h2>Divertiti! 🎮</h2><p id='remainingText' style='color:#ff7733; font-weight:bold;'></p><button class='back-home-btn' onclick='location.href=\"minigioco.html\"'>⬅️ Torna al Menu</button>";
+  document.body.appendChild(backBox);
+  
+  updateRemainingText();
+  startMiniGame();
+}
+
+/* MINI GAME */
+let timer;
+let running=false;
+
+const punishments={
+  Minecraft:["usa solo terra per 10 minuti ⛏️", "trova un creeper e abbraccialo 💥", "trova un diamante 💎", "mangia solo carne marcia per 10 minuti 🍖", "trova un villaggio 🛖", "puoi toccare solo il verde 💚", "puoi toccare solo il blu 💙", "usi solo la spada 🔪", "usi solo un bastoncino 🪵", "fai una danza strana (rl) minimo 10s🕺", "trova uno smeraldo 💎💚", "scava 100 blocchi in basso 🪨" , "costruisci un cuore di lana 🧡", "usi solo il piccone in legno 🪓"],
+  Fortnite:["Atterra dove dico 😈","Skin ridicola 😂", "Complimento obbligatorio 💖", "zero build per 10 minuti 🧱", "SOLO armi rare o più 🔫", "trattieni il respiro quando costruisci 🤯", "canta una canzone per intero (NO STOP) 🎵", "APPLAUSI (5s) 👏", "o vinci o mi compri un ballo 💃", "no parolacce 🤬", "puoi insulatre solo le piante 🌿", "FULL materiali 🧱🪨🧲", "usi solo cecchini 🎯", "chiudi gli occhi per 10 secondi 🫣", "respira SOLO dalla bocca 🫁"],
+  Altro:["Non senti (10 minuti) 🙉","non vedi (10 minuti) 🙈", "non parli (10 minuti) 🙊", "ora sei un gatto (10 minuti) 🐱", "mouse mano sinistra e tastiera mano destra 🖥️", "ciò che dovresti fare... non falro 🧡", "modalità robot 🤖", "modalità fantasma 👻", "clicca risposte o cose a caso 🎲", "elenca 10 cose ROSSE ❤️", "puoi parlare solo in inglese 🔤", "non dire né si né no 🤫", "non fumare per 15 minuti 🚭", "fai 10 addominali 🤸", "fai 2 flessioni 💪", "ti amo 🧡"]
+};
+
+function updateRemainingText() {
+  let textEl = document.getElementById("remainingText");
+  if(textEl) {
+    textEl.innerText = "Sfide rimaste: " + currentPunishments.length;
+  }
+}
+
+function startMiniGame(){
+  if(running) return;
+  running=true;
+
+  timer=setInterval(()=>{
+    if(currentPunishments.length === 0) {
+      clearInterval(timer);
+      running = false;
+      
+      let playingBox = document.getElementById("playingBox");
+      if(playingBox) playingBox.remove();
+      
+      // CAMBIA LA FOTO FINALE IN BASE AL GIOCO SCELTO (Minecraft, Fortnite o Altro)
+      let endImg = document.getElementById("endGameImg");
+      if(game === "Minecraft") {
+        endImg.src = "linguaccia.jpeg";
+      } else if(game === "Fortnite") {
+        endImg.src = "CUCCIOLINO.jpeg";
+      } else {
+        endImg.src = "bb.jpeg";
+      }
+      
+      // Gestisce l'errore se la foto è un .jpg invece di .jpeg
+      endImg.onerror = function() {
+        if(this.src.endsWith(".jpeg")) {
+          this.src = this.src.replace(".jpeg", ".jpg");
+        }
+      };
+
+      document.getElementById("endGameBox").style.display = "block";
+      return;
+    }
+
+    const randomIndex = Math.floor(Math.random() * currentPunishments.length);
+    const p = currentPunishments[randomIndex];
+    currentPunishments.splice(randomIndex, 1);
+    
+    updateRemainingText();
+    popup(p);
+  }, 600000); // 10 minuti in millisecondi
+}
+
+/* POPUP CORRETTO */
+function popup(t){
+  let p=document.getElementById("popup");
+  p.innerText=t;
+  p.classList.add("show");
+  setTimeout(() => p.classList.remove("show"), 2500); // Rimane visibile 2,5 secondi
+}
+
+/* CUORI */
+function createHeart(){
+  const h=document.createElement("div");
+  h.classList.add("heart");
+  h.innerText="🧡";
+
+  h.style.left=Math.random()*window.innerWidth+"px";
+  h.style.fontSize=(10+Math.random()*20)+"px";
+  h.style.animationDuration=(3+Math.random()*3)+"s";
+
+  document.body.appendChild(h);
+  setTimeout(()=>h.remove(),6000);
+}
+
+setInterval(createHeart,300);
+</script>
+</body>
+</html>
